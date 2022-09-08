@@ -41,22 +41,18 @@ def get_soup(url: str) -> BeautifulSoup:
     return retn
 
 
-def get_list(url: str, container_class_or_id: str, index=0) -> list:
+def get_list(url: str, container_attribute: str, index=0) -> list:
     """
     Get list of links from HTML.
     :param url: URL to get list from.
-    :param container_class_or_id: Class or ID of the html element that holds the items to extract. You can also specify an attribute with its value, like: attribute=value without using any quotes.
+    :param container_attribute: the attribute with its value of the html element that holds the items to extract. You can specify an attribute with its value, like: attribute=value without using any quotes.
     :param index: Index of the container with the defined class or id to return (needed when there are more elements in the page with the same class or id).
     :return: List of extracted items.
     """
     soup = get_soup(url)
     retn = []
-    if container_class_or_id.__contains__("="):
-        elements = soup.find_all(attrs={container_class_or_id.split("=")[0]: container_class_or_id.split("=")[1]})
-    else:
-        elements = soup.find_all(class_=container_class_or_id)
-    if len(elements) == 0:
-        elements = soup.find_all(id=container_class_or_id)
+    elements = soup.find_all(
+        attrs={container_attribute.split("=")[0].strip(): container_attribute.split("=")[1].strip()})
     for element in elements[index].contents:
         rows = BeautifulSoup(str(element), "html.parser").find_all()
         i = RssItem()
@@ -108,11 +104,11 @@ def clean_string(txt: str) -> str:
     return txt.strip()
 
 
-def get_feed(url: str, container_class_or_id: str, index=0) -> str:
+def get_feed(url: str, container_attribute: str, index=0) -> str:
     """
     Returns RSS feed from webpage.
     :param url: URL of the webpage with the content.
-    :param container_class_or_id: Class or ID of the html element that holds the items to extract.
+    :param container_attribute: the attribute with its value of the html element that holds the items to extract. You can specify an attribute with its value, like: attribute=value without using any quotes.
     :param index: Index of the container with the defined class or id to return (needed when there are more elements in the page with the same class or id).
     :return: RSS feed.
     """
@@ -122,7 +118,7 @@ def get_feed(url: str, container_class_or_id: str, index=0) -> str:
     fg.author({'name': 'NCSC SOB IFC', 'email': 'sob@ncsc.nl'})
     fg.subtitle('Generated from ' + url)
     fg.language('en')
-    items = get_list(url, container_class_or_id, index)
+    items = get_list(url, container_attribute, index)
     for item in items:
         fe = fg.add_entry()
         fe.title(item.title)
@@ -132,8 +128,32 @@ def get_feed(url: str, container_class_or_id: str, index=0) -> str:
     return fg.rss_str(pretty=True)
 
 
-# print(get_feed('https://www.ncsc.gov.uk/section/keep-up-to-date/ncsc-news', 'search-results'))
+def to_single_line(txt: str) -> str:
+    """
+    Converts a string to a single line.
+    :param txt: String to convert.
+    :return: Single line string.
+    """
+    return txt.replace("\n", "").replace("\r", "").replace("\t", "").replace("  ", " ").strip()
+
+
+def get_jsonl(url: str, container_class_or_id: str, index=0) -> str:
+    """
+    Returns JSONL output from webpage, which can be read by the Prodigy tool (https://prodi.gy/docs).
+    :param url: URL of the webpage with the content.
+    :param container_attribute: the attribute with its value of the html element that holds the items to extract. You can specify an attribute with its value, like: attribute=value without using any quotes.
+    :param index: Index of the container with the defined class or id to return (needed when there are more elements in the page with the same class or id).
+    :return: RSS feed.
+    """
+    items = get_list(url, container_class_or_id, index)
+    retn = ""
+    for item in items:
+        retn += "{\"text\": \"" + to_single_line(item.description) + "\"}\n"
+    return retn
+
+
+# print(get_feed('https://www.ncsc.gov.uk/section/keep-up-to-date/ncsc-news', 'class=search-results'))
 # print(get_feed('https://www.zdnet.com/blog/security/', 'data-component=lazyloadImages'))
-# print(get_feed('https://informationsecuritybuzz.com/', 'exad-row-wrapper'))
-# print(get_feed('https://grahamcluley.com/', 'grid-row'))
-print(get_feed('https://threatpost.com/', 'latest_news_container'))
+# print(get_feed('https://informationsecuritybuzz.com/', 'class=exad-row-wrapper'))
+# print(get_feed('https://grahamcluley.com/', 'class=grid-row'))
+# print(get_jsonl('https://threatpost.com/', 'id=latest_news_container'))
