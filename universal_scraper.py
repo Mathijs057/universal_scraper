@@ -173,5 +173,5 @@ def get_feed(url: str =  Query(None, description="The url-encoded URL of the web
         fe.pubDate(item.pubDate)
     return fg.rss_str(pretty=True)
 
-print(get_feed("https%3A%2F%2Fwww.ncsc.gov.uk%2Fsection%2Fkeep-up-to-date%2Fncsc-news%3Fq%3D%26defaultTypes%3Dnews%2Cinformation%26sort%3Ddate%252Bdesc", "class=search-results"))
+# print(get_feed("https%3A%2F%2Fwww.ncsc.gov.uk%2Fsection%2Fkeep-up-to-date%2Fncsc-news%3Fq%3D%26defaultTypes%3Dnews%2Cinformation%26sort%3Ddate%252Bdesc", "class=search-results"))
 
