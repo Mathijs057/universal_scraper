@@ -7,7 +7,7 @@ import pytz
 import requests
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from feedgen.feed import FeedGenerator
 from requests import Response
 from requests_html import HTMLSession
@@ -150,13 +150,9 @@ def clean_string(txt: str) -> str:
 
 
 @app.get('/get_feed')
-def get_feed(url: str, container_attribute: str, index=0) -> Response:
+def get_feed(url: str =  Query(None, description="The url-encoded URL of the website that contains the information to extract."), container_attribute: str = Query(None, description="The html attribute of the HTML container that holds the list of information te be extract, like 'class=search_results' or 'id=newslist'. Don't use any quotes."), index=Query(0, description="The index of the container, in case the site contains more than one HTML-element with the same container_attributes.")) -> Response:
     """
     Returns RSS feed from webpage.
-    :param url: The url-encoded URL of the webpage with the content.
-    :param container_attribute: the attribute with its value of the html element that holds the items to extract. You can specify an attribute with its value, like: attribute=value without using any quotes.
-    :param index: Index of the container with the defined class or id to return (needed when there are more elements in the page with the same class or id).
-    :return: RSS feed.
     """
     url = unquote(url)
     fg = FeedGenerator()
