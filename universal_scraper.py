@@ -72,6 +72,7 @@ def get_list(url: str, container_attribute: str, index=0) -> list:
     :param index: Index of the container with the defined class or id to return (needed when there are more elements in the page with the same class or id).
     :return: List of extracted items.
     """
+    index = int(index)
     soup = get_soup(url)
     retn = []
     try:
@@ -154,6 +155,8 @@ def get_feed(url: str =  Query(None, description="The url-encoded URL of the web
     """
     Returns RSS feed from webpage.
     """
+    if not isinstance(index, int):
+        index = 0
     url = unquote(url)
     fg = FeedGenerator()
     fg.title('Universal RSS feed')
@@ -170,4 +173,5 @@ def get_feed(url: str =  Query(None, description="The url-encoded URL of the web
         fe.pubDate(item.pubDate)
     return fg.rss_str(pretty=True)
 
-# print(get_feed("https%3A%2F%2Fwww.ncsc.gov.uk%2Fsection%2Fkeep-up-to-date%2Fncsc-news%3Fq%3D%26defaultTypes%3Dnews%2Cinformation%26sort%3Ddate%252Bdesc", "class=search-results"))
+print(get_feed("https%3A%2F%2Fwww.ncsc.gov.uk%2Fsection%2Fkeep-up-to-date%2Fncsc-news%3Fq%3D%26defaultTypes%3Dnews%2Cinformation%26sort%3Ddate%252Bdesc", "class=search-results"))
+
