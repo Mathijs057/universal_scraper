@@ -172,5 +172,6 @@ def get_feed(url: str =  Query(None, description="The url-encoded URL of the web
         fe.pubDate(item.pubDate)
     return fg.rss_str(pretty=False)
 
+# Example test:
 # print(get_feed(url="https%3A%2F%2Fwww.ncsc.gov.uk%2Fsection%2Fkeep-up-to-date%2Fncsc-news%3Fq%3D%26defaultTypes%3Dnews%2Cinformation%26sort%3Ddate%252Bdesc", container_attribute="class=search-results"))
 
