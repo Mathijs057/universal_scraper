@@ -66,13 +66,12 @@ def get_soup(url: str) -> BeautifulSoup:
 
 def get_list(url: str, container_attribute: str, index=0) -> list:
     """
-    Get list of links from HTML.
-    :param url: URL to get list from.
+    Get list of texts from HTML.
+    :param url: the url-encoded URL to get list from.
     :param container_attribute: the attribute with its value of the html element that holds the items to extract. You can specify an attribute with its value, like: attribute=value without using any quotes.
     :param index: Index of the container with the defined class or id to return (needed when there are more elements in the page with the same class or id).
     :return: List of extracted items.
     """
-    index = int(index)
     soup = get_soup(url)
     retn = []
     try:
@@ -94,7 +93,7 @@ def get_list(url: str, container_attribute: str, index=0) -> list:
         try:
             lnk = BeautifulSoup(str(element), "html.parser").find("a").get("href")
             if not i.link.startswith(url):
-                i.link = "https://" + url.replace("https://", "").split("/")[0] + i.link
+                i.link = "https://" + url.replace("https://", "").split("/")[0] + lnk
         except AttributeError:
             pass
         if lnk == "":
@@ -137,7 +136,7 @@ def clean_string(txt: str) -> str:
     :param txt: String to clean.
     :return: Cleaned string.
     """
-    txt = re.sub(r"[^a-zA-Z0-9 ,.:;]", "", txt).replace(".", ". ").replace(":", ": ").replace(";", "; ").replace(",",
+    txt = re.sub(r"[^a-zA-Z0-9 ,.:_;-]", "", txt).replace(".", ". ").replace(":", ": ").replace(";", "; ").replace(",",
                                                                                                                  ", ")
     while txt.__contains__("\n\n"):
         txt = txt.replace("\n\n", "\n")
@@ -171,7 +170,7 @@ def get_feed(url: str =  Query(None, description="The url-encoded URL of the web
         fe.link(href=item.link)
         fe.description(item.description)
         fe.pubDate(item.pubDate)
-    return fg.rss_str(pretty=True)
+    return fg.rss_str(pretty=False)
 
-# print(get_feed("https%3A%2F%2Fwww.ncsc.gov.uk%2Fsection%2Fkeep-up-to-date%2Fncsc-news%3Fq%3D%26defaultTypes%3Dnews%2Cinformation%26sort%3Ddate%252Bdesc", "class=search-results"))
+# print(get_feed(url="https%3A%2F%2Fwww.ncsc.gov.uk%2Fsection%2Fkeep-up-to-date%2Fncsc-news%3Fq%3D%26defaultTypes%3Dnews%2Cinformation%26sort%3Ddate%252Bdesc", container_attribute="class=search-results"))
 
