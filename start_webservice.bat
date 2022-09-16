@@ -1,0 +1,1 @@
+uvicorn universal_scraper:app --reload
